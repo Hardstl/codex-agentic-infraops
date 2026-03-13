@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "requirements-artifact.v2.schema.json",
+  "title": "Requirements Artifact v2",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "deployment_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "azure_location": {
+          "type": "string",
+          "minLength": 1
+        },
+        "project_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "dev",
+            "test",
+            "qa",
+            "prod"
+          ]
+        },
+        "workload_demand_profile": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "availability_target": {
+          "type": "string",
+          "enum": [
+            "cost-first",
+            "balanced",
+            "resilience-first"
+          ]
+        },
+        "cost_objective": {
+          "type": "string",
+          "enum": [
+            "lowest-cost",
+            "balanced",
+            "performance-first"
+          ]
+        }
+      },
+      "required": [
+        "azure_location",
+        "project_name",
+        "environment",
+        "workload_demand_profile",
+        "availability_target",
+        "cost_objective"
+      ]
+    }
+  },
+  "properties": {
+    "protocol_version": {
+      "const": "workflow.v2"
+    },
+    "artifact_type": {
+      "const": "requirements.v2"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9]{8}_[a-z0-9]+(?:-[a-z0-9]+)*_(dev|test|qa|prod)_[a-z0-9]{4}$"
+    },
+    "generated_by": {
+      "const": "requirements"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requirements_summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "functional_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "non_functional_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "risk_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommended_service_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deployment_profile": {
+          "$ref": "#/$defs/deployment_profile"
+        }
+      },
+      "required": [
+        "requirements_summary",
+        "functional_requirements",
+        "non_functional_requirements",
+        "assumptions",
+        "constraints",
+        "risk_notes",
+        "open_questions",
+        "recommended_service_scope",
+        "deployment_profile"
+      ]
+    }
+  },
+  "required": [
+    "protocol_version",
+    "artifact_type",
+    "run_id",
+    "generated_by",
+    "generated_at",
+    "data"
+  ]
+}

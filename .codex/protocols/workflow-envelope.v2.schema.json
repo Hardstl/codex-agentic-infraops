@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "workflow-envelope.v2.schema.json",
+  "title": "Workflow Envelope v2",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "protocol_version": {
+      "const": "workflow.v2"
+    },
+    "from": {
+      "enum": [
+        "root_orchestrator",
+        "requirements",
+        "research",
+        "code",
+        "validate"
+      ]
+    },
+    "to": {
+      "enum": [
+        "root_orchestrator",
+        "requirements",
+        "research",
+        "code",
+        "validate"
+      ]
+    },
+    "type": {
+      "enum": [
+        "INIT_REQUIREMENTS",
+        "ASK_USER",
+        "USER_ANSWERS",
+        "FINAL_REQUIREMENTS",
+        "INIT_RESEARCH",
+        "RESEARCH_PROGRESS",
+        "FINAL_RESEARCH_EVIDENCE",
+        "INIT_CODE",
+        "CODE_PROGRESS",
+        "FINAL_AUTHORING_EVIDENCE",
+        "INIT_VALIDATE",
+        "VALIDATE_PROGRESS",
+        "FINAL_VALIDATOR_EVIDENCE",
+        "ERROR"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9]{8}_[a-z0-9]+(?:-[a-z0-9]+)*_(dev|test|qa|prod)_[a-z0-9]{4}$"
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "protocol_version",
+    "from",
+    "to",
+    "type",
+    "run_id",
+    "payload"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "INIT_REQUIREMENTS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "root_orchestrator"
+          },
+          "to": {
+            "const": "requirements"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "USER_ANSWERS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "root_orchestrator"
+          },
+          "to": {
+            "const": "requirements"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "ASK_USER"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "requirements"
+          },
+          "to": {
+            "const": "root_orchestrator"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "FINAL_REQUIREMENTS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "requirements"
+          },
+          "to": {
+            "const": "root_orchestrator"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "INIT_RESEARCH"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "root_orchestrator"
+          },
+          "to": {
+            "const": "research"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "RESEARCH_PROGRESS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "research"
+          },
+          "to": {
+            "const": "root_orchestrator"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "FINAL_RESEARCH_EVIDENCE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "research"
+          },
+          "to": {
+            "const": "root_orchestrator"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "INIT_CODE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "root_orchestrator"
+          },
+          "to": {
+            "const": "code"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "CODE_PROGRESS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "code"
+          },
+          "to": {
+            "const": "root_orchestrator"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "FINAL_AUTHORING_EVIDENCE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "code"
+          },
+          "to": {
+            "const": "root_orchestrator"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "INIT_VALIDATE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "root_orchestrator"
+          },
+          "to": {
+            "const": "validate"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "VALIDATE_PROGRESS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "validate"
+          },
+          "to": {
+            "const": "root_orchestrator"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "FINAL_VALIDATOR_EVIDENCE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "const": "validate"
+          },
+          "to": {
+            "const": "root_orchestrator"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "ERROR"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "from": {
+            "enum": [
+              "requirements",
+              "research",
+              "code",
+              "validate"
+            ]
+          },
+          "to": {
+            "const": "root_orchestrator"
+          }
+        }
+      }
+    }
+  ]
+}

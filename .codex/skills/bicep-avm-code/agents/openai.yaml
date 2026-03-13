@@ -1,0 +1,10 @@
+interface:
+  display_name: "Bicep AVM Authoring"
+  short_description: "Author and remediate Azure Bicep with AVM-first patterns"
+  default_prompt: "Author or update Azure Bicep with AVM-first patterns, use the design brief, structured handoff artifact, or task context as the contract, then run an internal validation and remediation loop with at most two remediation passes before returning validated output."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "bicep"
+      description: "Azure Bicep MCP server"

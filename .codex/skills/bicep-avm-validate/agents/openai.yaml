@@ -1,0 +1,10 @@
+interface:
+  display_name: "Bicep AVM Validate"
+  short_description: "Validate Azure Bicep against AVM-first authoring rules"
+  default_prompt: "Validate authored Azure Bicep with diagnostics, build, lint, and self-contained AVM-first checks for direct AVM modules, producer-owned capabilities, security/naming/networking guardrails, and same-file Storage/Key Vault access wiring, then report blockers without modifying infrastructure code."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "bicep"
+      description: "Azure Bicep MCP server"

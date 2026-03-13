@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "artifacts/progress-events-artifact.v2.schema.json",
+  "title": "Progress Events Artifact v2",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9]{8}_[a-z0-9]+(?:-[a-z0-9]+)*_(dev|test|qa|prod)_[a-z0-9]{4}$"
+    },
+    "event_id": {
+      "type": "string",
+      "enum": [
+        "requirements_agent_started",
+        "requirements_finalized",
+        "requirements_artifact_written",
+        "gate1_waiting_approval",
+        "research_agent_started",
+        "research_finalized",
+        "research_artifact_written",
+        "waiting_service_option_confirmations",
+        "service_confirmations_artifact_written",
+        "gate2_waiting_approval",
+        "gate1_marker_created",
+        "gate2_marker_created",
+        "authoring_agent_started",
+        "authoring_finalized",
+        "authoring_artifact_written",
+        "validator_agent_started",
+        "validator_pass",
+        "validator_fail",
+        "remediation_cycle_started",
+        "blocking_issues_remain",
+        "validator_marker_created",
+        "duplicate_completion_ignored",
+        "requirements_summary_rendered",
+        "research_summary_rendered",
+        "authoring_summary_rendered",
+        "validator_summary_rendered"
+      ]
+    }
+  },
+  "properties": {
+    "protocol_version": {
+      "const": "workflow.v2"
+    },
+    "artifact_type": {
+      "const": "progress.events.v2"
+    },
+    "run_id": {
+      "$ref": "#/$defs/run_id"
+    },
+    "generated_by": {
+      "const": "root_orchestrator"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_catalog_path": {
+          "type": "string",
+          "const": ".codex/protocols/progress-event-catalog.v2.json"
+        },
+        "fail_closed_on_violation": {
+          "type": "boolean"
+        },
+        "events": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "timestamp_utc": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "event_id": {
+                "$ref": "#/$defs/event_id"
+              },
+              "rendered_line": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 140
+              },
+              "placeholders": {
+                "type": "object",
+                "minProperties": 1
+              },
+              "validation_status": {
+                "type": "string",
+                "enum": [
+                  "PASS",
+                  "FAIL"
+                ]
+              }
+            },
+            "required": [
+              "timestamp_utc",
+              "event_id",
+              "rendered_line",
+              "placeholders",
+              "validation_status"
+            ]
+          }
+        }
+      },
+      "required": [
+        "source_catalog_path",
+        "fail_closed_on_violation",
+        "events"
+      ]
+    }
+  },
+  "required": [
+    "protocol_version",
+    "artifact_type",
+    "run_id",
+    "generated_by",
+    "generated_at",
+    "data"
+  ]
+}

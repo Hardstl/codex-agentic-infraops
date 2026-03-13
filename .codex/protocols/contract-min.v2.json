@@ -1,0 +1,509 @@
+{
+  "contract_version": "workflow.contract-min.v2",
+  "generated_at_utc": "2026-03-04T19:30:41.0114057Z",
+  "sources": [
+    ".codex/protocols/workflow-envelope.v2.schema.json",
+    ".codex/protocols/requirements.v2.schema.json",
+    ".codex/protocols/research.v2.schema.json",
+    ".codex/protocols/artifacts/requirements-artifact.v2.schema.json",
+    ".codex/protocols/artifacts/research-evidence-artifact.v2.schema.json",
+    ".codex/protocols/artifacts/service-confirmations-artifact.v2.schema.json",
+    ".codex/protocols/artifacts/authoring-evidence-artifact.v2.schema.json",
+    ".codex/protocols/artifacts/validator-evidence-artifact.v2.schema.json",
+    ".codex/protocols/artifacts/progress-events-artifact.v2.schema.json",
+    ".codex/protocols/progress-event-catalog.v2.json",
+    ".codex/protocols/code.v2.schema.json",
+    ".codex/protocols/validate.v2.schema.json"
+  ],
+  "runtime": {
+    "protocol_version": "workflow.v2",
+    "run_id_pattern": "^[0-9]{8}_[a-z0-9]+(?:-[a-z0-9]+)*_(dev|test|qa|prod)_[a-z0-9]{4}$",
+    "participants": [
+      "root_orchestrator",
+      "requirements",
+      "research",
+      "code",
+      "validate"
+    ],
+    "workflow_message_types": [
+      "INIT_REQUIREMENTS",
+      "ASK_USER",
+      "USER_ANSWERS",
+      "FINAL_REQUIREMENTS",
+      "INIT_RESEARCH",
+      "RESEARCH_PROGRESS",
+      "FINAL_RESEARCH_EVIDENCE",
+      "ERROR",
+      "INIT_CODE",
+      "CODE_PROGRESS",
+      "FINAL_AUTHORING_EVIDENCE",
+      "INIT_VALIDATE",
+      "VALIDATE_PROGRESS",
+      "FINAL_VALIDATOR_EVIDENCE"
+    ]
+  },
+  "requirements_exchange": {
+    "message_types": [
+      "INIT_REQUIREMENTS",
+      "USER_ANSWERS",
+      "ASK_USER",
+      "FINAL_REQUIREMENTS",
+      "ERROR"
+    ],
+    "inbound_to_requirements": [
+      "INIT_REQUIREMENTS",
+      "USER_ANSWERS"
+    ],
+    "outbound_from_requirements": [
+      "ASK_USER",
+      "FINAL_REQUIREMENTS",
+      "ERROR"
+    ],
+    "ask_user": {
+      "required_payload_fields": [
+        "phase",
+        "context",
+        "questions"
+      ],
+      "phase_enum": [
+        "business_discovery",
+        "workload_detection",
+        "service_recommendations"
+      ],
+      "question_required_fields": [
+        "header",
+        "id",
+        "question"
+      ],
+      "question_id_enum": [
+        "azure_location",
+        "project_name",
+        "environment",
+        "workload_demand_profile",
+        "availability_target",
+        "cost_objective"
+      ],
+      "free_text_ids_require_no_options": [],
+      "selection_ids_require_options": [
+        "environment",
+        "workload_demand_profile",
+        "availability_target",
+        "cost_objective"
+      ],
+      "request_user_input_option_limits": {
+        "options_min": 2,
+        "options_max": 3
+      },
+      "all_question_ids_require_options_for_ui": [
+        "azure_location",
+        "project_name",
+        "environment",
+        "workload_demand_profile",
+        "availability_target",
+        "cost_objective"
+      ]
+    },
+    "user_answers": {
+      "required_payload_fields": [
+        "answers"
+      ],
+      "allowed_answer_keys": [
+        "azure_location",
+        "project_name",
+        "environment",
+        "workload_demand_profile",
+        "availability_target",
+        "cost_objective"
+      ],
+      "enums": {
+        "environment": [
+          "dev",
+          "test",
+          "qa",
+          "prod"
+        ],
+        "workload_demand_profile": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "availability_target": [
+          "cost-first",
+          "balanced",
+          "resilience-first"
+        ],
+        "cost_objective": [
+          "lowest-cost",
+          "balanced",
+          "performance-first"
+        ]
+      },
+      "guid_fields": []
+    },
+    "final_requirements": {
+      "required_payload_fields": [
+        "requirements_summary",
+        "functional_requirements",
+        "non_functional_requirements",
+        "assumptions",
+        "constraints",
+        "risk_notes",
+        "open_questions",
+        "recommended_service_scope",
+        "deployment_profile"
+      ],
+      "deployment_profile_required": [
+        "azure_location",
+        "project_name",
+        "environment",
+        "workload_demand_profile",
+        "availability_target",
+        "cost_objective"
+      ],
+      "deployment_profile_optional": []
+    }
+  },
+  "research_exchange": {
+    "message_types": [
+      "INIT_RESEARCH",
+      "RESEARCH_PROGRESS",
+      "FINAL_RESEARCH_EVIDENCE",
+      "ERROR"
+    ],
+    "inbound_to_research": [
+      "INIT_RESEARCH"
+    ],
+    "outbound_from_research": [
+      "RESEARCH_PROGRESS",
+      "FINAL_RESEARCH_EVIDENCE",
+      "ERROR"
+    ],
+    "init_research": {
+      "required_payload_fields": [
+        "requirements_artifact_path",
+        "requirements"
+      ]
+    },
+    "research_progress": {
+      "required_payload_fields": [
+        "progress_message"
+      ]
+    },
+    "final_research_evidence": {
+      "required_payload_fields": [
+        "artifact_path",
+        "artifact_sha256",
+        "preview",
+        "counts"
+      ],
+      "optional_payload_fields": [
+        "service_confirmation_requests"
+      ],
+      "preview_limits": {
+        "summary_max_chars": 600,
+        "array_max_items": 5,
+        "item_max_chars": 180
+      },
+      "service_confirmation_request_limits": {
+        "max_requests": 5,
+        "header_max_chars": 12,
+        "question_max_chars": 160,
+        "options_min": 2,
+        "options_max": 3,
+        "option_description_max_chars": 180
+      },
+      "counts_required_fields": [
+        "requirement_mapping_total",
+        "conflicts_or_gaps_total",
+        "implementation_implications_total",
+        "citations_total",
+        "truncated"
+      ]
+    }
+  },
+  "artifacts": {
+    "requirements_artifact": {
+      "artifact_type": "requirements.v2",
+      "generated_by": "requirements",
+      "required_fields": [
+        "protocol_version",
+        "artifact_type",
+        "run_id",
+        "generated_by",
+        "generated_at",
+        "data"
+      ],
+      "data_required_fields": [
+        "requirements_summary",
+        "functional_requirements",
+        "non_functional_requirements",
+        "assumptions",
+        "constraints",
+        "risk_notes",
+        "open_questions",
+        "recommended_service_scope",
+        "deployment_profile"
+      ]
+    },
+    "research_evidence_artifact": {
+      "artifact_type": "research.evidence.v2",
+      "generated_by": "research",
+      "required_fields": [
+        "protocol_version",
+        "artifact_type",
+        "run_id",
+        "generated_by",
+        "generated_at",
+        "data"
+      ],
+      "data_required_fields": [
+        "evidence_summary",
+        "requirement_mapping",
+        "conflicts_or_gaps",
+        "implementation_implications",
+        "citations",
+        "service_confirmation_requests"
+      ]
+    },
+    "service_confirmations_artifact": {
+      "artifact_type": "service.confirmations.v2",
+      "generated_by": "root_orchestrator",
+      "required_fields": [
+        "protocol_version",
+        "artifact_type",
+        "run_id",
+        "generated_by",
+        "generated_at",
+        "data"
+      ],
+      "data_required_fields": [
+        "source_research_artifact_path",
+        "selections"
+      ]
+    },
+    "authoring_evidence_artifact": {
+      "artifact_type": "authoring.evidence.v2",
+      "generated_by": "code",
+      "required_fields": [
+        "protocol_version",
+        "artifact_type",
+        "run_id",
+        "generated_by",
+        "generated_at",
+        "data"
+      ],
+      "data_required_fields": [
+        "input_artifacts",
+        "selected_service_options",
+        "avm_modules",
+        "files_written",
+        "validations",
+        "blockers",
+        "notes"
+      ]
+    },
+    "validator_evidence_artifact": {
+      "artifact_type": "validator.evidence.v2",
+      "generated_by": "validate",
+      "required_fields": [
+        "protocol_version",
+        "artifact_type",
+        "run_id",
+        "generated_by",
+        "generated_at",
+        "data"
+      ],
+      "data_required_fields": [
+        "validation_status",
+        "check_summary",
+        "checks",
+        "blockers",
+        "validated_files",
+        "inputs_used",
+        "rule_set_version",
+        "tool_results",
+        "recommendations"
+      ]
+    },
+    "progress_events_artifact": {
+      "artifact_type": "progress.events.v2",
+      "generated_by": "root_orchestrator",
+      "required_fields": [
+        "protocol_version",
+        "artifact_type",
+        "run_id",
+        "generated_by",
+        "generated_at",
+        "data"
+      ],
+      "data_required_fields": [
+        "source_catalog_path",
+        "fail_closed_on_violation",
+        "events"
+      ]
+    }
+  },
+  "progress_events": {
+    "catalog_path": ".codex/protocols/progress-event-catalog.v2.json",
+    "artifact_path_pattern": "output/<run_id>/progress.events.v2.json",
+    "line_max_chars": 140,
+    "fail_mode": "fail_closed",
+    "required_event_ids": [
+      "requirements_agent_started",
+      "requirements_finalized",
+      "requirements_artifact_written",
+      "gate1_waiting_approval",
+      "research_agent_started",
+      "research_finalized",
+      "research_artifact_written",
+      "waiting_service_option_confirmations",
+      "service_confirmations_artifact_written",
+      "gate2_waiting_approval",
+      "gate1_marker_created",
+      "gate2_marker_created",
+      "authoring_agent_started",
+      "authoring_finalized",
+      "authoring_artifact_written",
+      "validator_agent_started",
+      "validator_pass",
+      "validator_fail",
+      "remediation_cycle_started",
+      "blocking_issues_remain",
+      "validator_marker_created",
+      "duplicate_completion_ignored",
+      "requirements_summary_rendered",
+      "research_summary_rendered",
+      "authoring_summary_rendered",
+      "validator_summary_rendered"
+    ]
+  },
+  "code_exchange": {
+    "message_types": [
+      "INIT_CODE",
+      "CODE_PROGRESS",
+      "FINAL_AUTHORING_EVIDENCE",
+      "ERROR"
+    ],
+    "inbound_to_code": [
+      "INIT_CODE"
+    ],
+    "outbound_from_code": [
+      "CODE_PROGRESS",
+      "FINAL_AUTHORING_EVIDENCE",
+      "ERROR"
+    ],
+    "init_code": {
+      "required_payload_fields": [
+        "requirements_artifact_path",
+        "research_evidence_artifact_path",
+        "service_confirmations_artifact_path",
+        "approval_markers",
+        "destination_path"
+      ],
+      "optional_payload_fields": [
+        "mode",
+        "validator_evidence_artifact_path",
+        "remediation_blockers"
+      ],
+      "approval_marker_required_fields": [
+        "gate1_marker_path",
+        "gate2_marker_path"
+      ],
+      "mode_enum": [
+        "full",
+        "preflight",
+        "remediation"
+      ]
+    },
+    "code_progress": {
+      "required_payload_fields": [
+        "progress_message"
+      ]
+    },
+    "final_authoring_evidence": {
+      "required_payload_fields": [
+        "artifact_path",
+        "artifact_sha256",
+        "preview",
+        "counts"
+      ],
+      "preview_limits": {
+        "summary_max_chars": 600,
+        "array_max_items": 5,
+        "item_max_chars": 180
+      },
+      "counts_required_fields": [
+        "files_written_total",
+        "avm_modules_total",
+        "blockers_total",
+        "truncated"
+      ]
+    }
+  },
+  "validate_exchange": {
+    "message_types": [
+      "INIT_VALIDATE",
+      "VALIDATE_PROGRESS",
+      "FINAL_VALIDATOR_EVIDENCE",
+      "ERROR"
+    ],
+    "inbound_to_validate": [
+      "INIT_VALIDATE"
+    ],
+    "outbound_from_validate": [
+      "VALIDATE_PROGRESS",
+      "FINAL_VALIDATOR_EVIDENCE",
+      "ERROR"
+    ],
+    "init_validate": {
+      "required_payload_fields": [
+        "requirements_artifact_path",
+        "research_evidence_artifact_path",
+        "service_confirmations_artifact_path",
+        "authoring_evidence_artifact_path",
+        "approval_markers",
+        "paths_to_validate"
+      ],
+      "optional_payload_fields": [
+        "validation_mode"
+      ],
+      "approval_marker_required_fields": [
+        "gate1_marker_path",
+        "gate2_marker_path"
+      ],
+      "validation_mode_enum": [
+        "strict"
+      ]
+    },
+    "validate_progress": {
+      "required_payload_fields": [
+        "progress_message"
+      ]
+    },
+    "final_validator_evidence": {
+      "required_payload_fields": [
+        "artifact_path",
+        "artifact_sha256",
+        "validation_status",
+        "preview",
+        "counts"
+      ],
+      "validation_status_enum": [
+        "PASS",
+        "FAIL"
+      ],
+      "preview_limits": {
+        "summary_max_chars": 600,
+        "array_max_items": 5,
+        "item_max_chars": 180
+      },
+      "counts_required_fields": [
+        "checks_total",
+        "failed_checks_total",
+        "blockers_total",
+        "validated_files_total",
+        "truncated"
+      ]
+    }
+  }
+}

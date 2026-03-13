@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "service-confirmations-artifact.v2.schema.json",
+  "title": "Service Confirmations Artifact v2",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "protocol_version": {
+      "const": "workflow.v2"
+    },
+    "artifact_type": {
+      "const": "service.confirmations.v2"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9]{8}_[a-z0-9]+(?:-[a-z0-9]+)*_(dev|test|qa|prod)_[a-z0-9]{4}$"
+    },
+    "generated_by": {
+      "const": "root_orchestrator"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_research_artifact_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_research_artifact_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "selections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "request_id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "question": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "selected_option_id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "selected_option_label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              }
+            },
+            "required": [
+              "request_id",
+              "question",
+              "selected_option_id",
+              "selected_option_label"
+            ]
+          }
+        }
+      },
+      "required": [
+        "source_research_artifact_path",
+        "selections"
+      ]
+    }
+  },
+  "required": [
+    "protocol_version",
+    "artifact_type",
+    "run_id",
+    "generated_by",
+    "generated_at",
+    "data"
+  ]
+}

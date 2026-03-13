@@ -1,0 +1,419 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "research.v2.schema.json",
+  "title": "Research Exchange v2",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "service_confirmation_option": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "description"
+      ]
+    },
+    "service_confirmation_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "header": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 12
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "recommended_option_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "options": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/service_confirmation_option"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "header",
+        "question",
+        "recommended_option_id",
+        "options"
+      ]
+    },
+    "deployment_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "azure_location": {
+          "type": "string",
+          "minLength": 1
+        },
+        "project_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "dev",
+            "test",
+            "qa",
+            "prod"
+          ]
+        },
+        "workload_demand_profile": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "availability_target": {
+          "type": "string",
+          "enum": [
+            "cost-first",
+            "balanced",
+            "resilience-first"
+          ]
+        },
+        "cost_objective": {
+          "type": "string",
+          "enum": [
+            "lowest-cost",
+            "balanced",
+            "performance-first"
+          ]
+        }
+      },
+      "required": [
+        "azure_location",
+        "project_name",
+        "environment",
+        "workload_demand_profile",
+        "availability_target",
+        "cost_objective"
+      ]
+    }
+  },
+  "properties": {
+    "protocol_version": {
+      "const": "workflow.v2"
+    },
+    "from": {
+      "enum": [
+        "root_orchestrator",
+        "research"
+      ]
+    },
+    "to": {
+      "enum": [
+        "root_orchestrator",
+        "research"
+      ]
+    },
+    "type": {
+      "enum": [
+        "INIT_RESEARCH",
+        "RESEARCH_PROGRESS",
+        "FINAL_RESEARCH_EVIDENCE",
+        "ERROR"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9]{8}_[a-z0-9]+(?:-[a-z0-9]+)*_(dev|test|qa|prod)_[a-z0-9]{4}$"
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "protocol_version",
+    "from",
+    "to",
+    "type",
+    "run_id",
+    "payload"
+  ],
+  "oneOf": [
+    {
+      "properties": {
+        "from": {
+          "const": "root_orchestrator"
+        },
+        "to": {
+          "const": "research"
+        },
+        "type": {
+          "const": "INIT_RESEARCH"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "requirements_artifact_path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "requirements": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "requirements_summary": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "functional_requirements": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "non_functional_requirements": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "assumptions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "constraints": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "risk_notes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "open_questions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "recommended_service_scope": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "deployment_profile": {
+                  "$ref": "#/$defs/deployment_profile"
+                }
+              },
+              "required": [
+                "requirements_summary",
+                "functional_requirements",
+                "non_functional_requirements",
+                "assumptions",
+                "constraints",
+                "risk_notes",
+                "open_questions",
+                "recommended_service_scope",
+                "deployment_profile"
+              ]
+            }
+          },
+          "required": [
+            "requirements_artifact_path",
+            "requirements"
+          ]
+        }
+      }
+    },
+    {
+      "properties": {
+        "from": {
+          "const": "research"
+        },
+        "to": {
+          "const": "root_orchestrator"
+        },
+        "type": {
+          "const": "RESEARCH_PROGRESS"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "progress_message": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "progress_message"
+          ]
+        }
+      }
+    },
+    {
+      "properties": {
+        "from": {
+          "const": "research"
+        },
+        "to": {
+          "const": "root_orchestrator"
+        },
+        "type": {
+          "const": "FINAL_RESEARCH_EVIDENCE"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "artifact_path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "artifact_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "preview": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600
+                },
+                "top_conflicts_or_gaps": {
+                  "type": "array",
+                  "maxItems": 5,
+                  "items": {
+                    "type": "string",
+                    "maxLength": 180
+                  }
+                },
+                "top_implementation_implications": {
+                  "type": "array",
+                  "maxItems": 5,
+                  "items": {
+                    "type": "string",
+                    "maxLength": 180
+                  }
+                }
+              },
+              "required": [
+                "summary",
+                "top_conflicts_or_gaps",
+                "top_implementation_implications"
+              ]
+            },
+            "counts": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "requirement_mapping_total": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "conflicts_or_gaps_total": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "implementation_implications_total": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "citations_total": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "truncated": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "requirement_mapping_total",
+                "conflicts_or_gaps_total",
+                "implementation_implications_total",
+                "citations_total",
+                "truncated"
+              ]
+            },
+            "service_confirmation_requests": {
+              "type": "array",
+              "maxItems": 5,
+              "items": {
+                "$ref": "#/$defs/service_confirmation_request"
+              }
+            }
+          },
+          "required": [
+            "artifact_path",
+            "artifact_sha256",
+            "preview",
+            "counts"
+          ]
+        }
+      }
+    },
+    {
+      "properties": {
+        "from": {
+          "const": "research"
+        },
+        "to": {
+          "const": "root_orchestrator"
+        },
+        "type": {
+          "const": "ERROR"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "message": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "message"
+          ]
+        }
+      }
+    }
+  ]
+}

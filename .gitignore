@@ -1,0 +1,22 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.azure/
+
+# Runtime outputs and local artifacts
+output/
+*.log
+*.tmp
+
+# Python cache 
+__pycache__/
+*.pyc
+
+# Contract test assets (not part of solution deliverable)
+.codex/protocols/tests/
+
+# Local environment files
+.env
+.env.*

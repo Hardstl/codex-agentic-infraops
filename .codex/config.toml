@@ -1,0 +1,36 @@
+model = "gpt-5.3-codex"
+model_reasoning_effort = "medium"
+personality = "pragmatic"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+network_access = true
+
+[windows]
+sandbox = "elevated"
+
+[sandbox_workspace_write]
+network_access = true
+
+[features]
+multi_agent = true
+default_mode_request_user_input = true
+
+[agents]
+max_threads = 5
+max_depth = 1
+
+[agents.requirements]
+config_file = "agents/requirements.toml"
+description = "Requirements sub-agent that emits schema-valid workflow envelopes"
+
+[agents.research]
+config_file = "agents/research.toml"
+description = "Microsoft Learn research sub-agent that emits evidence-pack envelopes"
+
+[agents.code]
+config_file = "agents/code.toml"
+description = "Post-approval coding sub-agent for AVM-first Bicep authoring"
+
+[agents.validate]
+config_file = "agents/validate.toml"
+description = "Post-authoring Bicep validation sub-agent (fail-closed)"
