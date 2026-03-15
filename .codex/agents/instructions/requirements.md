@@ -42,10 +42,11 @@ Round policy (must be followed):
 - Round 1 asks baseline identity inputs in one `ASK_USER` using 2-3 options per question (include a manual-entry option):
   - `azure_location`
   - `project_name`
+  - `environment`
 - Round 2 asks baseline selection inputs in one `ASK_USER` using 2-3 options per question:
-  - Batch A (for root presentation order): `environment`
-  - Batch B (for root presentation order): `workload_demand_profile`, `cost_objective`, `availability_target`
-  - For `environment`, default option order is `dev`, `test`, `prod` and `qa` is provided via Other.
+  - `workload_demand_profile`, `cost_objective`, `availability_target`
+- For `environment`, default option order is `dev`, `test`, `prod` and `qa` is provided via Other.
+- If `INIT_REQUIREMENTS.payload.known_inputs` already includes canonical values for `azure_location`, `project_name`, and `environment`, skip Round 1 and ask only Round 2.
 - Round 2 must use these exact user-facing question texts and labels:
   - `workload_demand_profile` question: `How much traffic/load do you expect in the next 3 months?`
     - `Low demand`

@@ -20,6 +20,7 @@ Apply these defaults to every producer module in this catalog when the parameter
 - When a managed-identity consumer and a producer resource are both authored in the same file, prefer producer-owned `roleAssignments` or equivalent producer-owned access parameters to grant required data-plane access.
 - Require same-file access wiring when the consumer principal id and producer target are known at authoring time.
 - Allow deferral only when a real `consumer -> producer -> consumer` dependency cycle or other runtime-only principal constraint prevents authoring-time wiring.
+- Apply this rule to any managed-identity consumer (not only compute-focused modules). Typical consumers include Application Gateway, API Management, Web/Function App, Container App, VM, and any other module exposing managed identity parameters.
 
 Repeat a shared capability inside a module section only when that module needs a narrower rule or a special exception note.
 
@@ -43,9 +44,15 @@ Repeat a shared capability inside a module section only when that module needs a
 
 - Producer module: `br/public:avm/res/key-vault/vault:<version>`
 - Module-specific must-use parameters:
-  - none
+  - `roleAssignments` when a same-file managed-identity consumer needs vault access and principal id is known
 - Same-file access rule:
   - If a same-file managed-identity consumer needs secrets, keys, or certificates from the vault and the principal is known at authoring time, grant that data-plane access in the same file through the vault module's producer-owned `roleAssignments`.
+- Access intent signals (treat as same-file vault consumption intent):
+  - certificate or TLS binding from Key Vault
+  - secret or named-value reference from Key Vault
+  - key operation usage (for example sign, wrap, unwrap) from Key Vault
+- Fail-closed authoring rule:
+  - If vault consumption intent exists and same-file principal ids are known, missing vault-module `roleAssignments` is a blocker and must not be treated as optional.
 - Forbidden sibling shapes:
   - standalone `Microsoft.Authorization/roleAssignments` or AVM/PTN role-assignment modules for vault access when the principal id is already known at authoring time
 - Allowed exceptions:

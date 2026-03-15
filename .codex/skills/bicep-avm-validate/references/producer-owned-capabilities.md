@@ -20,9 +20,10 @@ Apply these defaults to every producer module in this catalog when the parameter
 
 ## Same-file access wiring
 
-- When a managed-identity compute consumer and a Storage account or Key Vault producer are both authored in the same file, require producer-owned `roleAssignments` on the data producer.
+- When a managed-identity consumer and a Storage account or Key Vault producer are both authored in the same file, require producer-owned `roleAssignments` on the data producer.
 - Treat consumer-only settings such as URIs, app settings, or identity toggles as insufficient without the producer-owned access grant.
-- When the compute resource is created first and the data producer depends on it or uses its outputs, treat same-file access wiring as required.
+- When the consumer resource is created first and the data producer depends on it or uses its outputs, treat same-file access wiring as required.
+- Apply this rule to any managed-identity consumer (not only compute-focused modules). Typical consumers include Application Gateway, API Management, Web/Function App, Container App, VM, and any other module exposing managed identity parameters.
 
 Repeat a shared capability inside a module section only when that module needs a narrower rule or a special validator note.
 
@@ -45,12 +46,18 @@ Repeat a shared capability inside a module section only when that module needs a
 
 - Producer module: `br/public:avm/res/key-vault/vault:<version>`
 - Module-specific must-use parameters:
-  - `roleAssignments` for same-file compute access
+  - `roleAssignments` for same-file managed-identity consumer access
 - Forbidden sibling shapes:
   - standalone `Microsoft.Authorization/roleAssignments` or AVM/PTN role-assignment modules for vault access
   - standalone `Microsoft.Network/privateEndpoints` or AVM private-endpoint modules when the vault module uses `privateEndpoints`
 - Same-file access rule:
-  - If a same-file managed-identity compute resource consumes the vault, require vault-module `roleAssignments` in that same file.
+  - If a same-file managed-identity consumer consumes the vault, require vault-module `roleAssignments` in that same file.
+- Access intent signals (treat as same-file vault consumption intent):
+  - certificate or TLS binding from Key Vault
+  - secret or named-value reference from Key Vault
+  - key operation usage (for example sign, wrap, unwrap) from Key Vault
+- Fail-closed validation rule:
+  - If vault consumption intent exists and same-file principal ids are known, missing vault-module `roleAssignments` is a blocker.
 
 ## SQL server
 
@@ -110,9 +117,9 @@ Repeat a shared capability inside a module section only when that module needs a
   - `minimumTlsVersion`
   - `supportsHttpsTrafficOnly`
   - `diagnosticSettings`
-  - `roleAssignments` for same-file compute access
+  - `roleAssignments` for same-file managed-identity consumer access
 - Same-file access rule:
-  - If a same-file managed-identity compute resource consumes blob, file, queue, or table data and the compute resource is created first with the storage account depending on it or using its outputs, require storage-account-module `roleAssignments` in that same file.
+  - If a same-file managed-identity consumer consumes blob, file, queue, or table data and the consumer is created first with the storage account depending on it or using its outputs, require storage-account-module `roleAssignments` in that same file.
 - Forbidden sibling shapes:
   - separate `Microsoft.Storage/storageAccounts/blobServices`, `fileServices`, `queueServices`, `tableServices`, `managementPolicies`, `localUsers`, or `objectReplicationPolicies` resources when their configuration is already captured via the producer parameters
   - standalone `Microsoft.Network/privateEndpoints` or AVM private-endpoint modules when `privateEndpoints` handles service connectivity

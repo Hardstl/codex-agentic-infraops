@@ -83,66 +83,70 @@ Prompt text is not a contract source of truth.
 
 ## Runtime Flow
 
-1. Create `run_id` (`YYYYMMDD_project-slug_env_xxxx`).
-2. Create `output/<run_id>/`.
+1. Collect pre-requirements Round 1 inputs in root CLI using `request_user_input`:
+   - `azure_location`
+   - `project_name`
+   - `environment`
+2. Create `run_id` (`YYYYMMDD_project-slug_env_xxxx`) using the selected `project_name` and `environment`.
+3. Create `output/<run_id>/`.
    - Initialize `output/<run_id>/progress.events.v2.json` (schema-valid scaffold with catalog path and fail-closed flag).
-3. Call `spawn_agent` for `requirements` with `fork_context=false`.
+4. Call `spawn_agent` for `requirements` with `fork_context=false`.
    - Persist run-state: `phase=requirements`, `thread_id`, `status=active`, `started_at`, `last_wait_at`, `wait_attempts=0`.
-4. Send `INIT_REQUIREMENTS` envelope.
-5. Loop until requirements emits `FINAL_REQUIREMENTS`:
+5. Send `INIT_REQUIREMENTS` envelope with `known_inputs` pre-populated from root Round 1 answers.
+6. Loop until requirements emits `FINAL_REQUIREMENTS`:
    - Call `wait` for the requirements `thread_id` with `timeout_ms=30000`; update `last_wait_at` and increment `wait_attempts`.
    - If elapsed wait exceeds 10 minutes for the phase, fail closed with `ERROR` and stop execution.
    - For `ASK_USER` questions with options, call `request_user_input` in root CLI (one question per decision).
-   - Present requirements round-2 option questions in two user-facing batches: Batch A (`environment`) then Batch B (`workload_demand_profile`, `cost_objective`, `availability_target`).
+   - Present requirements round-2 option questions for `workload_demand_profile`, `cost_objective`, and `availability_target`.
    - For `ASK_USER` questions without options, collect plain-text answers in root CLI and map them to the same question ids.
    - Send `USER_ANSWERS` envelope back to requirements.
    - On first valid `FINAL_REQUIREMENTS`, accept once, mark phase complete, and call `close_agent` for the requirements `thread_id`.
    - On repeated completion notifications for the same phase, emit `duplicate_completion_ignored` and continue.
-6. Validate and write `output/<run_id>/requirements.v2.json`.
+7. Validate and write `output/<run_id>/requirements.v2.json`.
    - Immediately render a compact Markdown summary in root CLI (display-only, print-only).
-   - Fail closed with `ERROR` unless the matching `requirements_summary_rendered` progress event is emitted before Step 7.
-7. Approval Gate 1:
+   - Fail closed with `ERROR` unless the matching `requirements_summary_rendered` progress event is emitted before Step 8.
+8. Approval Gate 1:
    - Request explicit user confirmation with `request_user_input` (single question, one decision, stable id, recommended option first).
    - If `request_user_input` is unavailable, ask plain-text confirmation and map to the same id.
-8. Call `spawn_agent` for `research` with `fork_context=false`.
+9. Call `spawn_agent` for `research` with `fork_context=false`.
    - Persist run-state for the research thread using the same required fields.
-9. Send `INIT_RESEARCH` envelope with normalized requirements and requirements artifact path.
-10. Wait for `FINAL_RESEARCH_EVIDENCE`.
+10. Send `INIT_RESEARCH` envelope with normalized requirements and requirements artifact path.
+11. Wait for `FINAL_RESEARCH_EVIDENCE`.
    - Use `wait` with `timeout_ms=30000` and enforce the same 15-minute max elapsed wait.
    - On first valid completion, accept once and call `close_agent` for the research `thread_id`.
    - Ignore duplicate completion notifications after first acceptance.
-11. Validate compact research envelope fields (`artifact_path`, `artifact_sha256`, preview/count bounds, optional `service_confirmation_requests` bounds), then validate artifact schema and checksum for `output/<run_id>/research.evidence.v2.json`.
+12. Validate compact research envelope fields (`artifact_path`, `artifact_sha256`, preview/count bounds, optional `service_confirmation_requests` bounds), then validate artifact schema and checksum for `output/<run_id>/research.evidence.v2.json`.
    - Immediately render a compact Markdown summary in root CLI (display-only, print-only).
-   - Fail closed with `ERROR` unless the matching `research_summary_rendered` progress event is emitted before Step 12 and Step 13.
-12. Inspect research `service_confirmation_requests`.
+   - Fail closed with `ERROR` unless the matching `research_summary_rendered` progress event is emitted before Step 13 and Step 14.
+13. Inspect research `service_confirmation_requests`.
    - If one or more requests are present, map them into `request_user_input` questions with options and recommended choice first.
    - Keep one decision per question and stable question ids; if `request_user_input` is unavailable, collect plain-text fallback responses mapped to the same ids.
    - Collect explicit selections in root CLI only; never ask the user for combined free-text codes such as `1A, 2B, 3C`.
    - Validate and write `output/<run_id>/service.confirmations.v2.json` even when the request list is empty.
-13. Approval Gate 2:
+14. Approval Gate 2:
    - Request explicit user confirmation with `request_user_input` (single question, one decision, stable id, recommended option first).
    - If `request_user_input` is unavailable, ask plain-text confirmation and map to the same id.
-14. Call `spawn_agent` for `code` with `fork_context=false`.
+15. Call `spawn_agent` for `code` with `fork_context=false`.
    - Persist run-state for the code thread using the same required fields.
-15. Send `INIT_CODE` envelope with normalized artifact paths, gate marker paths, and destination path.
-16. Wait for `FINAL_AUTHORING_EVIDENCE`.
+16. Send `INIT_CODE` envelope with normalized artifact paths, gate marker paths, and destination path.
+17. Wait for `FINAL_AUTHORING_EVIDENCE`.
    - Use `wait` with `timeout_ms=30000` and enforce the same 15-minute max elapsed wait.
    - On first valid completion, accept once and call `close_agent` for the code `thread_id`.
    - Ignore duplicate completion notifications after first acceptance.
-17. Validate compact code/authoring envelope fields (`artifact_path`, `artifact_sha256`, preview/count bounds), then validate artifact schema and checksum for `output/<run_id>/authoring.evidence.v2.json`.
+18. Validate compact code/authoring envelope fields (`artifact_path`, `artifact_sha256`, preview/count bounds), then validate artifact schema and checksum for `output/<run_id>/authoring.evidence.v2.json`.
    - Immediately render a compact Markdown summary in root CLI (display-only, print-only).
-   - Fail closed with `ERROR` unless the matching `authoring_summary_rendered` progress event is emitted before Step 18.
-18. Call `spawn_agent` for `validate` with `fork_context=false`.
+   - Fail closed with `ERROR` unless the matching `authoring_summary_rendered` progress event is emitted before Step 19.
+19. Call `spawn_agent` for `validate` with `fork_context=false`.
    - Persist run-state for the validate thread using the same required fields.
-19. Send `INIT_VALIDATE` envelope with normalized artifact paths, gate marker paths, and authored destination path(s).
-20. Wait for `FINAL_VALIDATOR_EVIDENCE`.
+20. Send `INIT_VALIDATE` envelope with normalized artifact paths, gate marker paths, and authored destination path(s).
+21. Wait for `FINAL_VALIDATOR_EVIDENCE`.
    - Use `wait` with `timeout_ms=30000` and enforce the same 15-minute max elapsed wait.
    - On first valid completion, accept once and call `close_agent` for the validate `thread_id`.
    - Ignore duplicate completion notifications after first acceptance.
-21. Validate compact validator envelope fields (`artifact_path`, `artifact_sha256`, `validation_status`, preview/count bounds), then validate artifact schema and checksum for `output/<run_id>/validator.evidence.v2.json`.
+22. Validate compact validator envelope fields (`artifact_path`, `artifact_sha256`, `validation_status`, preview/count bounds), then validate artifact schema and checksum for `output/<run_id>/validator.evidence.v2.json`.
    - Immediately render a compact Markdown summary in root CLI (display-only, print-only).
    - Fail closed with `ERROR` unless the matching `validator_summary_rendered` progress event is emitted before any final completion or success marker handling.
-22. If validator fails, run remediation loop (max 3 cycles):
+23. If validator fails, run remediation loop (max 3 cycles):
    - If code agent thread is active, send remediation blockers via `send_input`.
    - If code agent thread is paused/waiting, resume with `resume_agent` and include remediation blockers.
    - If code agent state is unknown/mismatched, fail closed with `ERROR`.
@@ -364,17 +368,17 @@ Treat `service.confirmations.v2.json` as the sole source of truth for user-confi
 
 - Trigger this workflow for any Azure infrastructure intent, including create/update/delete/deploy/configure operations.
 - Do not execute Azure-mutating operations (MCP Azure writes, `az` create/update/delete, IaC deploy) until:
-  - Step 6 is complete, and
+  - Step 7 is complete, and
   - Approval Gate 1 is explicitly approved by user, and
-  - Step 11 is complete, and
-  - Step 12 service-choice confirmations are complete, and
+  - Step 12 is complete, and
+  - Step 13 service-choice confirmations are complete, and
   - Approval Gate 2 is explicitly approved by user, and
-  - Step 17 is complete, and
-  - Step 22 is complete.
+  - Step 18 is complete, and
+  - Step 23 is complete.
 - Do not execute Bicep code mutations until:
-  - Step 6 is complete, and
-  - Step 11 is complete, and
-  - Step 12 service-choice confirmations are complete, and
+  - Step 7 is complete, and
+  - Step 12 is complete, and
+  - Step 13 service-choice confirmations are complete, and
   - Approval Gate 2 is explicitly approved by user.
 - If validator status is `FAIL`, stop workflow and require remediation loop (max 3 cycles) before any Azure mutation.
 - If a request arrives and these preconditions are not met, do not proceed with direct Azure actions. Start at Runtime Flow step 1.
@@ -445,7 +449,7 @@ Treat `service.confirmations.v2.json` as the sole source of truth for user-confi
   - `resume_agent`
   - `request_user_input`
 
-### Requirements Phase (Steps 1-7)
+### Requirements Phase (Steps 1-8)
 
 - Allowed reads:
   - `.codex/protocols/contract-min.v2.json`
@@ -462,7 +466,7 @@ Treat `service.confirmations.v2.json` as the sole source of truth for user-confi
   - Root orchestrator and requirements subagent must not call MCP tools in this phase.
   - Root orchestrator may use only the root collab tool allowlist for orchestration and user confirmation.
 
-### Research Phase (Steps 8-13)
+### Research Phase (Steps 9-14)
 
 - Allowed reads:
   - `.codex/protocols/contract-min.v2.json`
@@ -480,7 +484,7 @@ Treat `service.confirmations.v2.json` as the sole source of truth for user-confi
   - Root orchestrator must not call Azure/Microsoft Learn/Bicep/OpenAI MCP tools directly.
   - Root orchestrator may use only the root collab tool allowlist for orchestration and user confirmation.
 
-### Code Phase (Steps 14-17)
+### Code Phase (Steps 15-18)
 
 - Allowed reads:
   - `.codex/protocols/contract-min.v2.json`
@@ -504,7 +508,7 @@ Treat `service.confirmations.v2.json` as the sole source of truth for user-confi
   - Root orchestrator must not load `.codex/skills/**` in this phase.
   - Root orchestrator may use only the root collab tool allowlist for orchestration and user confirmation.
 
-### Validation Phase (Steps 18-22)
+### Validation Phase (Steps 19-23)
 
 - Allowed reads:
   - `.codex/protocols/contract-min.v2.json`
