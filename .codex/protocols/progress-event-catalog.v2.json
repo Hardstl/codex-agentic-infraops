@@ -1,202 +1,117 @@
 {
   "catalog_version": "progress-events.v2",
-  "line_max_chars": 140,
   "artifact_relative_path": "output/<run_id>/progress.events.v2.json",
-  "fail_closed_on_violation": true,
+  "render_mode": "best_effort",
   "events": [
     {
       "event_id": "requirements_agent_started",
-      "template": "▶️ [<run_id>] Starting requirements agent",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Collecting requirements inputs",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "requirements_finalized",
-      "template": "✅ [<run_id>] Requirements finalized",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Requirements finalized",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "requirements_artifact_written",
-      "template": "📝 [<run_id>] Wrote requirements artifact: <path> (sha256: <8-char-prefix>...)",
-      "placeholders_required": [
-        "run_id",
-        "path",
-        "sha8"
-      ]
+      "display_hint": "Requirements artifact written",
+      "placeholders_expected": ["run_id", "path", "sha8"]
     },
     {
       "event_id": "gate1_waiting_approval",
-      "template": "⏸️ [<run_id>] Waiting for Gate 1 approval",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Waiting for Gate 1 approval",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "research_agent_started",
-      "template": "▶️ [<run_id>] Starting research agent",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Starting research agent",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "research_finalized",
-      "template": "✅ [<run_id>] Research finalized",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Research finalized",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "research_artifact_written",
-      "template": "📝 [<run_id>] Wrote research artifact: <path> (sha256: <8-char-prefix>...)",
-      "placeholders_required": [
-        "run_id",
-        "path",
-        "sha8"
-      ]
+      "display_hint": "Research artifact written",
+      "placeholders_expected": ["run_id", "path", "sha8"]
     },
     {
       "event_id": "waiting_service_option_confirmations",
-      "template": "⏸️ [<run_id>] Waiting for service option confirmations",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Waiting for service option confirmations",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "service_confirmations_artifact_written",
-      "template": "📝 [<run_id>] Wrote service confirmations artifact: <path> (sha256: <8-char-prefix>...)",
-      "placeholders_required": [
-        "run_id",
-        "path",
-        "sha8"
-      ]
+      "display_hint": "Service confirmations artifact written",
+      "placeholders_expected": ["run_id", "path", "sha8"]
     },
     {
       "event_id": "gate2_waiting_approval",
-      "template": "⏸️ [<run_id>] Waiting for Gate 2 approval",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Waiting for Gate 2 approval",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "gate1_marker_created",
-      "template": "🔐 [<run_id>] Gate 1 marker created: .gate1.approved",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Gate 1 marker created",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "gate2_marker_created",
-      "template": "🔐 [<run_id>] Gate 2 marker created: .gate2.approved",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Gate 2 marker created",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "authoring_agent_started",
-      "template": "▶️ [<run_id>] Starting authoring agent",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Starting authoring agent",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "authoring_finalized",
-      "template": "✅ [<run_id>] Authoring finalized",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Authoring finalized",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "authoring_artifact_written",
-      "template": "📝 [<run_id>] Wrote authoring artifact: <path> (sha256: <8-char-prefix>...)",
-      "placeholders_required": [
-        "run_id",
-        "path",
-        "sha8"
-      ]
+      "display_hint": "Authoring artifact written",
+      "placeholders_expected": ["run_id", "path", "sha8"]
     },
     {
       "event_id": "validator_agent_started",
-      "template": "▶️ [<run_id>] Starting validator agent",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Starting validator agent",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "validator_pass",
-      "template": "✅ [<run_id>] Validator PASS",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Validator PASS",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "validator_fail",
-      "template": "❌ [<run_id>] Validator FAIL (cycle <n>/3)",
-      "placeholders_required": [
-        "run_id",
-        "n"
-      ]
+      "display_hint": "Validator FAIL",
+      "placeholders_expected": ["run_id", "n"]
     },
     {
       "event_id": "remediation_cycle_started",
-      "template": "🔁 [<run_id>] Remediation cycle <n>/3 started",
-      "placeholders_required": [
-        "run_id",
-        "n"
-      ]
+      "display_hint": "Remediation cycle started",
+      "placeholders_expected": ["run_id", "n"]
     },
     {
       "event_id": "blocking_issues_remain",
-      "template": "🧱 [<run_id>] Blocking issues remain: <top 3>",
-      "placeholders_required": [
-        "run_id",
-        "top_3"
-      ]
+      "display_hint": "Blocking issues remain",
+      "placeholders_expected": ["run_id", "top_3"]
     },
     {
       "event_id": "validator_marker_created",
-      "template": "🏁 [<run_id>] Validator marker created: .validator.passed",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Validator marker created",
+      "placeholders_expected": ["run_id"]
     },
     {
       "event_id": "duplicate_completion_ignored",
-      "template": "ℹ️ [<run_id>] Duplicate completion ignored for <phase>",
-      "placeholders_required": [
-        "run_id",
-        "phase"
-      ]
-    },
-    {
-      "event_id": "requirements_summary_rendered",
-      "template": "🧾 [<run_id>] Requirements summary rendered",
-      "placeholders_required": [
-        "run_id"
-      ]
-    },
-    {
-      "event_id": "research_summary_rendered",
-      "template": "🧾 [<run_id>] Research summary rendered",
-      "placeholders_required": [
-        "run_id"
-      ]
-    },
-    {
-      "event_id": "authoring_summary_rendered",
-      "template": "🧾 [<run_id>] Authoring summary rendered",
-      "placeholders_required": [
-        "run_id"
-      ]
-    },
-    {
-      "event_id": "validator_summary_rendered",
-      "template": "🧾 [<run_id>] Validator summary rendered",
-      "placeholders_required": [
-        "run_id"
-      ]
+      "display_hint": "Duplicate completion ignored",
+      "placeholders_expected": ["run_id", "phase"]
     }
   ]
 }

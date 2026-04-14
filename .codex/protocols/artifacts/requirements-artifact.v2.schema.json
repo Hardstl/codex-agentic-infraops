@@ -73,7 +73,7 @@
       "pattern": "^[0-9]{8}_[a-z0-9]+(?:-[a-z0-9]+)*_(dev|test|qa|prod)_[a-z0-9]{4}$"
     },
     "generated_by": {
-      "const": "requirements"
+      "const": "root_orchestrator"
     },
     "generated_at": {
       "type": "string",

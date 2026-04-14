@@ -1,5 +1,5 @@
-model = "gpt-5.3-codex"
-model_reasoning_effort = "medium"
+model = "gpt-5.4"
+model_reasoning_effort = "high"
 personality = "pragmatic"
 approval_policy = "never"
 sandbox_mode = "workspace-write"
@@ -17,10 +17,6 @@ default_mode_request_user_input = true
 [agents]
 max_threads = 5
 max_depth = 1
-
-[agents.requirements]
-config_file = "agents/requirements.toml"
-description = "Requirements sub-agent that emits schema-valid workflow envelopes"
 
 [agents.research]
 config_file = "agents/research.toml"

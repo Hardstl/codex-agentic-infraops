@@ -20,16 +20,11 @@
     "run_id_pattern": "^[0-9]{8}_[a-z0-9]+(?:-[a-z0-9]+)*_(dev|test|qa|prod)_[a-z0-9]{4}$",
     "participants": [
       "root_orchestrator",
-      "requirements",
       "research",
       "code",
       "validate"
     ],
     "workflow_message_types": [
-      "INIT_REQUIREMENTS",
-      "ASK_USER",
-      "USER_ANSWERS",
-      "FINAL_REQUIREMENTS",
       "INIT_RESEARCH",
       "RESEARCH_PROGRESS",
       "FINAL_RESEARCH_EVIDENCE",
@@ -42,126 +37,60 @@
       "FINAL_VALIDATOR_EVIDENCE"
     ]
   },
-  "requirements_exchange": {
-    "message_types": [
-      "INIT_REQUIREMENTS",
-      "USER_ANSWERS",
-      "ASK_USER",
-      "FINAL_REQUIREMENTS",
-      "ERROR"
+  "requirements_intake": {
+    "owner": "root_orchestrator",
+    "round_1_question_ids": [
+      "azure_location",
+      "project_name",
+      "environment"
     ],
-    "inbound_to_requirements": [
-      "INIT_REQUIREMENTS",
-      "USER_ANSWERS"
+    "round_2_question_ids": [
+      "workload_demand_profile",
+      "cost_objective",
+      "availability_target"
     ],
-    "outbound_from_requirements": [
-      "ASK_USER",
-      "FINAL_REQUIREMENTS",
-      "ERROR"
-    ],
-    "ask_user": {
-      "required_payload_fields": [
-        "phase",
-        "context",
-        "questions"
+    "enum_answers": {
+      "environment": [
+        "dev",
+        "test",
+        "qa",
+        "prod"
       ],
-      "phase_enum": [
-        "business_discovery",
-        "workload_detection",
-        "service_recommendations"
+      "workload_demand_profile": [
+        "low",
+        "medium",
+        "high"
       ],
-      "question_required_fields": [
-        "header",
-        "id",
-        "question"
+      "availability_target": [
+        "cost-first",
+        "balanced",
+        "resilience-first"
       ],
-      "question_id_enum": [
-        "azure_location",
-        "project_name",
-        "environment",
-        "workload_demand_profile",
-        "availability_target",
-        "cost_objective"
-      ],
-      "free_text_ids_require_no_options": [],
-      "selection_ids_require_options": [
-        "environment",
-        "workload_demand_profile",
-        "availability_target",
-        "cost_objective"
-      ],
-      "request_user_input_option_limits": {
-        "options_min": 2,
-        "options_max": 3
-      },
-      "all_question_ids_require_options_for_ui": [
-        "azure_location",
-        "project_name",
-        "environment",
-        "workload_demand_profile",
-        "availability_target",
-        "cost_objective"
+      "cost_objective": [
+        "lowest-cost",
+        "balanced",
+        "performance-first"
       ]
     },
-    "user_answers": {
-      "required_payload_fields": [
-        "answers"
-      ],
-      "allowed_answer_keys": [
-        "azure_location",
-        "project_name",
-        "environment",
-        "workload_demand_profile",
-        "availability_target",
-        "cost_objective"
-      ],
-      "enums": {
-        "environment": [
-          "dev",
-          "test",
-          "qa",
-          "prod"
-        ],
-        "workload_demand_profile": [
-          "low",
-          "medium",
-          "high"
-        ],
-        "availability_target": [
-          "cost-first",
-          "balanced",
-          "resilience-first"
-        ],
-        "cost_objective": [
-          "lowest-cost",
-          "balanced",
-          "performance-first"
-        ]
-      },
-      "guid_fields": []
-    },
-    "final_requirements": {
-      "required_payload_fields": [
-        "requirements_summary",
-        "functional_requirements",
-        "non_functional_requirements",
-        "assumptions",
-        "constraints",
-        "risk_notes",
-        "open_questions",
-        "recommended_service_scope",
-        "deployment_profile"
-      ],
-      "deployment_profile_required": [
-        "azure_location",
-        "project_name",
-        "environment",
-        "workload_demand_profile",
-        "availability_target",
-        "cost_objective"
-      ],
-      "deployment_profile_optional": []
-    }
+    "payload_required_fields": [
+      "requirements_summary",
+      "functional_requirements",
+      "non_functional_requirements",
+      "assumptions",
+      "constraints",
+      "risk_notes",
+      "open_questions",
+      "recommended_service_scope",
+      "deployment_profile"
+    ],
+    "deployment_profile_required": [
+      "azure_location",
+      "project_name",
+      "environment",
+      "workload_demand_profile",
+      "availability_target",
+      "cost_objective"
+    ]
   },
   "research_exchange": {
     "message_types": [
@@ -180,8 +109,7 @@
     ],
     "init_research": {
       "required_payload_fields": [
-        "requirements_artifact_path",
-        "requirements"
+        "requirements_artifact_path"
       ]
     },
     "research_progress": {
@@ -206,10 +134,18 @@
       },
       "service_confirmation_request_limits": {
         "max_requests": 5,
+        "request_modes": [
+          "selection",
+          "forced_confirmation"
+        ],
         "header_max_chars": 12,
         "question_max_chars": 160,
-        "options_min": 2,
-        "options_max": 3,
+        "selection_options_min": 2,
+        "selection_options_max": 3,
+        "forced_confirmation_requires": [
+          "sole_option",
+          "sole_option_reason"
+        ],
         "option_description_max_chars": 180
       },
       "counts_required_fields": [
@@ -224,7 +160,7 @@
   "artifacts": {
     "requirements_artifact": {
       "artifact_type": "requirements.v2",
-      "generated_by": "requirements",
+      "generated_by": "root_orchestrator",
       "required_fields": [
         "protocol_version",
         "artifact_type",
@@ -338,7 +274,6 @@
       ],
       "data_required_fields": [
         "source_catalog_path",
-        "fail_closed_on_violation",
         "events"
       ]
     }
@@ -346,9 +281,8 @@
   "progress_events": {
     "catalog_path": ".codex/protocols/progress-event-catalog.v2.json",
     "artifact_path_pattern": "output/<run_id>/progress.events.v2.json",
-    "line_max_chars": 140,
-    "fail_mode": "fail_closed",
-    "required_event_ids": [
+    "render_mode": "best_effort",
+    "canonical_event_ids": [
       "requirements_agent_started",
       "requirements_finalized",
       "requirements_artifact_written",
@@ -370,11 +304,7 @@
       "remediation_cycle_started",
       "blocking_issues_remain",
       "validator_marker_created",
-      "duplicate_completion_ignored",
-      "requirements_summary_rendered",
-      "research_summary_rendered",
-      "authoring_summary_rendered",
-      "validator_summary_rendered"
+      "duplicate_completion_ignored"
     ]
   },
   "code_exchange": {

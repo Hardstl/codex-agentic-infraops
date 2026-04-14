@@ -11,7 +11,6 @@
     "from": {
       "enum": [
         "root_orchestrator",
-        "requirements",
         "research",
         "code",
         "validate"
@@ -20,7 +19,6 @@
     "to": {
       "enum": [
         "root_orchestrator",
-        "requirements",
         "research",
         "code",
         "validate"
@@ -28,10 +26,6 @@
     },
     "type": {
       "enum": [
-        "INIT_REQUIREMENTS",
-        "ASK_USER",
-        "USER_ANSWERS",
-        "FINAL_REQUIREMENTS",
         "INIT_RESEARCH",
         "RESEARCH_PROGRESS",
         "FINAL_RESEARCH_EVIDENCE",
@@ -61,82 +55,6 @@
     "payload"
   ],
   "allOf": [
-    {
-      "if": {
-        "properties": {
-          "type": {
-            "const": "INIT_REQUIREMENTS"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "from": {
-            "const": "root_orchestrator"
-          },
-          "to": {
-            "const": "requirements"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "type": {
-            "const": "USER_ANSWERS"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "from": {
-            "const": "root_orchestrator"
-          },
-          "to": {
-            "const": "requirements"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "type": {
-            "const": "ASK_USER"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "from": {
-            "const": "requirements"
-          },
-          "to": {
-            "const": "root_orchestrator"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "type": {
-            "const": "FINAL_REQUIREMENTS"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "from": {
-            "const": "requirements"
-          },
-          "to": {
-            "const": "root_orchestrator"
-          }
-        }
-      }
-    },
     {
       "if": {
         "properties": {
@@ -320,7 +238,6 @@
         "properties": {
           "from": {
             "enum": [
-              "requirements",
               "research",
               "code",
               "validate"

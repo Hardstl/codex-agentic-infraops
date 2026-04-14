@@ -31,6 +31,16 @@
       ]
     },
     "service_confirmation_request": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/selection_confirmation_request"
+        },
+        {
+          "$ref": "#/$defs/forced_confirmation_request"
+        }
+      ]
+    },
+    "selection_confirmation_request": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -47,6 +57,9 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 160
+        },
+        "request_mode": {
+          "const": "selection"
         },
         "recommended_option_id": {
           "type": "string",
@@ -65,63 +78,48 @@
         "id",
         "header",
         "question",
+        "request_mode",
         "recommended_option_id",
         "options"
       ]
     },
-    "deployment_profile": {
+    "forced_confirmation_request": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "azure_location": {
+        "id": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^[a-z][a-z0-9_]*$"
         },
-        "project_name": {
+        "header": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "maxLength": 12
         },
-        "environment": {
+        "question": {
           "type": "string",
-          "enum": [
-            "dev",
-            "test",
-            "qa",
-            "prod"
-          ]
+          "minLength": 1,
+          "maxLength": 160
         },
-        "workload_demand_profile": {
-          "type": "string",
-          "enum": [
-            "low",
-            "medium",
-            "high"
-          ]
+        "request_mode": {
+          "const": "forced_confirmation"
         },
-        "availability_target": {
-          "type": "string",
-          "enum": [
-            "cost-first",
-            "balanced",
-            "resilience-first"
-          ]
+        "sole_option": {
+          "$ref": "#/$defs/service_confirmation_option"
         },
-        "cost_objective": {
+        "sole_option_reason": {
           "type": "string",
-          "enum": [
-            "lowest-cost",
-            "balanced",
-            "performance-first"
-          ]
+          "minLength": 1,
+          "maxLength": 180
         }
       },
       "required": [
-        "azure_location",
-        "project_name",
-        "environment",
-        "workload_demand_profile",
-        "availability_target",
-        "cost_objective"
+        "id",
+        "header",
+        "question",
+        "request_mode",
+        "sole_option",
+        "sole_option_reason"
       ]
     }
   },
@@ -184,77 +182,10 @@
             "requirements_artifact_path": {
               "type": "string",
               "minLength": 1
-            },
-            "requirements": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "requirements_summary": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "functional_requirements": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "non_functional_requirements": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "assumptions": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "constraints": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "risk_notes": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "open_questions": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "recommended_service_scope": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "deployment_profile": {
-                  "$ref": "#/$defs/deployment_profile"
-                }
-              },
-              "required": [
-                "requirements_summary",
-                "functional_requirements",
-                "non_functional_requirements",
-                "assumptions",
-                "constraints",
-                "risk_notes",
-                "open_questions",
-                "recommended_service_scope",
-                "deployment_profile"
-              ]
             }
           },
           "required": [
-            "requirements_artifact_path",
-            "requirements"
+            "requirements_artifact_path"
           ]
         }
       }

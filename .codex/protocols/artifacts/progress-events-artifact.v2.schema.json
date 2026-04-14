@@ -33,11 +33,7 @@
         "remediation_cycle_started",
         "blocking_issues_remain",
         "validator_marker_created",
-        "duplicate_completion_ignored",
-        "requirements_summary_rendered",
-        "research_summary_rendered",
-        "authoring_summary_rendered",
-        "validator_summary_rendered"
+        "duplicate_completion_ignored"
       ]
     }
   },
@@ -66,12 +62,8 @@
           "type": "string",
           "const": ".codex/protocols/progress-event-catalog.v2.json"
         },
-        "fail_closed_on_violation": {
-          "type": "boolean"
-        },
         "events": {
           "type": "array",
-          "minItems": 1,
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -83,36 +75,19 @@
               "event_id": {
                 "$ref": "#/$defs/event_id"
               },
-              "rendered_line": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 140
-              },
               "placeholders": {
-                "type": "object",
-                "minProperties": 1
-              },
-              "validation_status": {
-                "type": "string",
-                "enum": [
-                  "PASS",
-                  "FAIL"
-                ]
+                "type": "object"
               }
             },
             "required": [
               "timestamp_utc",
-              "event_id",
-              "rendered_line",
-              "placeholders",
-              "validation_status"
+              "event_id"
             ]
           }
         }
       },
       "required": [
         "source_catalog_path",
-        "fail_closed_on_violation",
         "events"
       ]
     }

@@ -1,7 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "requirements.v2.schema.json",
-  "title": "Requirements Exchange v2",
+  "title": "Requirements Payload v2",
+  "description": "Root-owned normalized requirements payload for Azure infrastructure workflows.",
   "type": "object",
   "additionalProperties": false,
   "$defs": {
@@ -62,354 +63,65 @@
     }
   },
   "properties": {
-    "protocol_version": {
-      "const": "workflow.v2"
-    },
-    "from": {
-      "enum": [
-        "root_orchestrator",
-        "requirements"
-      ]
-    },
-    "to": {
-      "enum": [
-        "root_orchestrator",
-        "requirements"
-      ]
-    },
-    "type": {
-      "enum": [
-        "INIT_REQUIREMENTS",
-        "USER_ANSWERS",
-        "ASK_USER",
-        "FINAL_REQUIREMENTS",
-        "ERROR"
-      ]
-    },
-    "run_id": {
+    "requirements_summary": {
       "type": "string",
-      "pattern": "^[0-9]{8}_[a-z0-9]+(?:-[a-z0-9]+)*_(dev|test|qa|prod)_[a-z0-9]{4}$"
+      "minLength": 1
     },
-    "payload": {
-      "type": "object"
+    "functional_requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "non_functional_requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risk_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommended_service_scope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "deployment_profile": {
+      "$ref": "#/$defs/deployment_profile"
     }
   },
   "required": [
-    "protocol_version",
-    "from",
-    "to",
-    "type",
-    "run_id",
-    "payload"
-  ],
-  "oneOf": [
-    {
-      "properties": {
-        "from": {
-          "const": "root_orchestrator"
-        },
-        "to": {
-          "const": "requirements"
-        },
-        "type": {
-          "const": "INIT_REQUIREMENTS"
-        },
-        "payload": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "goal_summary": {
-              "type": "string",
-              "minLength": 1
-            },
-            "known_inputs": {
-              "type": "object",
-              "additionalProperties": true
-            },
-            "constraints": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "required": [
-            "goal_summary",
-            "known_inputs",
-            "constraints"
-          ]
-        }
-      }
-    },
-    {
-      "properties": {
-        "from": {
-          "const": "root_orchestrator"
-        },
-        "to": {
-          "const": "requirements"
-        },
-        "type": {
-          "const": "USER_ANSWERS"
-        },
-        "payload": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "answers": {
-              "type": "object",
-              "minProperties": 1,
-              "additionalProperties": false,
-              "properties": {
-                "azure_location": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "project_name": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "environment": {
-                  "type": "string",
-                  "enum": [
-                    "dev",
-                    "test",
-                    "qa",
-                    "prod"
-                  ]
-                },
-                "workload_demand_profile": {
-                  "type": "string",
-                  "enum": [
-                    "low",
-                    "medium",
-                    "high"
-                  ]
-                },
-                "availability_target": {
-                  "type": "string",
-                  "enum": [
-                    "cost-first",
-                    "balanced",
-                    "resilience-first"
-                  ]
-                },
-                "cost_objective": {
-                  "type": "string",
-                  "enum": [
-                    "lowest-cost",
-                    "balanced",
-                    "performance-first"
-                  ]
-                }
-              }
-            }
-          },
-          "required": [
-            "answers"
-          ]
-        }
-      }
-    },
-    {
-      "properties": {
-        "from": {
-          "const": "requirements"
-        },
-        "to": {
-          "const": "root_orchestrator"
-        },
-        "type": {
-          "const": "ASK_USER"
-        },
-        "payload": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "phase": {
-              "type": "string",
-              "enum": [
-                "business_discovery",
-                "workload_detection",
-                "service_recommendations"
-              ]
-            },
-            "context": {
-              "type": "string",
-              "minLength": 1
-            },
-            "questions": {
-              "type": "array",
-              "minItems": 1,
-              "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "header": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 12
-                  },
-                  "id": {
-                    "type": "string",
-                    "enum": [
-                      "azure_location",
-                      "project_name",
-                      "environment",
-                      "workload_demand_profile",
-                      "availability_target",
-                      "cost_objective"
-                    ]
-                  },
-                  "question": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "options": {
-                    "type": "array",
-                    "minItems": 2,
-                    "maxItems": 3,
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "properties": {
-                        "label": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "description": {
-                          "type": "string",
-                          "minLength": 1
-                        }
-                      },
-                      "required": [
-                        "label",
-                        "description"
-                      ]
-                    }
-                  }
-                },
-                "required": [
-                  "header",
-                  "id",
-                  "question",
-                  "options"
-                ]
-              }
-            }
-          },
-          "required": [
-            "phase",
-            "context",
-            "questions"
-          ]
-        }
-      }
-    },
-    {
-      "properties": {
-        "from": {
-          "const": "requirements"
-        },
-        "to": {
-          "const": "root_orchestrator"
-        },
-        "type": {
-          "const": "FINAL_REQUIREMENTS"
-        },
-        "payload": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "requirements_summary": {
-              "type": "string",
-              "minLength": 1
-            },
-            "functional_requirements": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "non_functional_requirements": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "assumptions": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "constraints": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "risk_notes": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "open_questions": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "recommended_service_scope": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "deployment_profile": {
-              "$ref": "#/$defs/deployment_profile"
-            }
-          },
-          "required": [
-            "requirements_summary",
-            "functional_requirements",
-            "non_functional_requirements",
-            "assumptions",
-            "constraints",
-            "risk_notes",
-            "open_questions",
-            "recommended_service_scope",
-            "deployment_profile"
-          ]
-        }
-      }
-    },
-    {
-      "properties": {
-        "from": {
-          "const": "requirements"
-        },
-        "to": {
-          "const": "root_orchestrator"
-        },
-        "type": {
-          "const": "ERROR"
-        },
-        "payload": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "message": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "required": [
-            "message"
-          ]
-        }
-      }
-    }
+    "requirements_summary",
+    "functional_requirements",
+    "non_functional_requirements",
+    "assumptions",
+    "constraints",
+    "risk_notes",
+    "open_questions",
+    "recommended_service_scope",
+    "deployment_profile"
   ]
 }

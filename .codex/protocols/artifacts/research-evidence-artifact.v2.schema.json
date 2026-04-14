@@ -100,64 +100,133 @@
         "service_confirmation_requests": {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "id": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9_]*$"
-              },
-              "header": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 12
-              },
-              "question": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 160
-              },
-              "recommended_option_id": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9_]*$"
-              },
-              "options": {
-                "type": "array",
-                "minItems": 2,
-                "maxItems": 3,
-                "items": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^[a-z][a-z0-9_]*$"
-                    },
-                    "label": {
-                      "type": "string",
-                      "minLength": 1,
-                      "maxLength": 80
-                    },
-                    "description": {
-                      "type": "string",
-                      "minLength": 1,
-                      "maxLength": 180
-                    }
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*$"
                   },
-                  "required": [
-                    "id",
-                    "label",
-                    "description"
-                  ]
-                }
+                  "header": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 12
+                  },
+                  "question": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "request_mode": {
+                    "const": "selection"
+                  },
+                  "recommended_option_id": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*$"
+                  },
+                  "options": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9_]*$"
+                        },
+                        "label": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "description": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 180
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "label",
+                        "description"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "header",
+                  "question",
+                  "request_mode",
+                  "recommended_option_id",
+                  "options"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*$"
+                  },
+                  "header": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 12
+                  },
+                  "question": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "request_mode": {
+                    "const": "forced_confirmation"
+                  },
+                  "sole_option": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9_]*$"
+                      },
+                      "label": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "description": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 180
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "label",
+                      "description"
+                    ]
+                  },
+                  "sole_option_reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 180
+                  }
+                },
+                "required": [
+                  "id",
+                  "header",
+                  "question",
+                  "request_mode",
+                  "sole_option",
+                  "sole_option_reason"
+                ]
               }
-            },
-            "required": [
-              "id",
-              "header",
-              "question",
-              "recommended_option_id",
-              "options"
             ]
           }
         }
